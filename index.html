@@ -60,6 +60,7 @@ button{min-width:170px;height:52px;border:none;border-radius:26px;background:#12
 button:disabled{opacity:.55}
 .center{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;flex:1;gap:20px}
 .center .big{font-size:64px}
+.bk{color:#121212}
 .center h2{font-weight:900;font-size:34px}
 .center p{font-size:15px;line-height:1.5;max-width:300px}
 </style>
@@ -142,8 +143,8 @@ button:disabled{opacity:.55}
 <!-- SISAK MÉG AKTÍV -->
 <div class="center" id="busyview">
   <div class="big">✋</div>
-  <h2>Ez a sisak még<br>használatban van</h2>
-  <p>Az előző videó még nincs kiküldve.<br><br>Kérd az operátor segítségét,<br>vagy válassz egy másik sisakot!</p>
+  <h2>Ez a sisak még<br><span class="bk">használatban van!</span></h2>
+  <p>Az előző videó még nincs kiküldve.<br><br><span class="bk">Kérd az operátor segítségét,<br>vagy válassz egy másik sisakot!</span></p>
 </div>
 
 <script>

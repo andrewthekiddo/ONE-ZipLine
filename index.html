@@ -16,28 +16,28 @@ body{background:#52AEBE;color:#fff;font-family:Mont,-apple-system,'Segoe UI',san
   min-height:100svh;display:flex;flex-direction:column;padding:28px 24px 32px;max-width:480px;margin:0 auto}
 .top{display:flex;justify-content:space-between;align-items:center}
 .sisak{font-weight:900;font-size:19px;letter-spacing:.5px}
-.logo{width:54px;height:54px;background:#fff;border-radius:50%;display:flex;align-items:center;
-  justify-content:center;color:#121212;font-style:italic;font-weight:900;font-size:20px;font-family:Georgia,serif}
+.logo{width:54px;height:54px}
+.logo svg,.logo img{width:100%;height:100%;display:block}
 .view{display:flex;flex-direction:column;flex:1}
 .hero{margin-top:64px}
 h1{font-weight:900;font-size:76px;letter-spacing:-1px;line-height:1}
-.sub{margin-top:28px;font-weight:900;font-size:17px;line-height:1.5}
+.sub{margin-top:28px;font-weight:900;font-size:17px;line-height:1.5;color:#121212}
 .field{margin-top:48px}
 input[type=tel]{width:100%;height:58px;border-radius:29px;border:1.5px solid #fff;
-  background:rgba(255,255,255,.16);color:#fff;font-family:inherit;font-size:18px;font-weight:400;
+  background:rgba(255,255,255,.35);color:#121212;font-family:inherit;font-size:18px;font-weight:900;
   padding:0 26px;outline:none}
-input[type=tel]::placeholder{color:rgba(255,255,255,.65)}
-input[type=tel]:focus{background:rgba(255,255,255,.24)}
+input[type=tel]::placeholder{color:rgba(18,18,18,.4)}
+input[type=tel]:focus{background:rgba(255,255,255,.45)}
 .err{margin-top:12px;font-size:13px;font-weight:900;color:#FFE1DE;background:rgba(255,91,78,.35);
   border-radius:12px;padding:10px 16px;display:none}
 .consent{margin-top:40px;display:flex;gap:14px;align-items:flex-start;cursor:pointer;user-select:none}
 .cbox{flex:none;width:27px;height:27px;border:1.6px solid #fff;border-radius:50%;display:flex;
-  align-items:center;justify-content:center;font-size:15px;font-weight:900;color:transparent;transition:all .15s}
-.consent.on .cbox{background:#fff;color:#52AEBE}
-.consent p{font-size:12.5px;line-height:1.45;font-weight:400}
+  align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;transition:all .15s}
+.consent.on .cbox{background:#fff;color:#121212;border-color:#fff}
+.consent p{font-size:12.5px;line-height:1.45;font-weight:400;color:#121212}
 .consent b{font-weight:900}
 .actions{margin-top:auto;padding-top:48px;display:flex;justify-content:center}
-button{min-width:150px;height:48px;border:none;border-radius:24px;background:#fff;color:#121212;
+button{min-width:170px;height:52px;border:none;border-radius:26px;background:#121212;color:#fff;
   font-family:inherit;font-weight:900;font-size:16px;cursor:pointer}
 button:disabled{opacity:.55}
 .center{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;flex:1;gap:20px}
@@ -50,7 +50,11 @@ button:disabled{opacity:.55}
 
 <div class="top">
   <div class="sisak" id="sisaklabel">ZIPLINE</div>
-  <div class="logo">one</div>
+  <div class="logo"><svg viewBox="0 0 54 54" xmlns="http://www.w3.org/2000/svg" aria-label="ONE">
+    <circle cx="27" cy="27" r="27" fill="#121212"/>
+    <text x="27" y="31" text-anchor="middle" font-family="Snell Roundhand,Savoye LET,Segoe Script,cursive" font-style="italic" font-weight="700" font-size="21" fill="#fff">one</text>
+    <path d="M11 38.5 Q27 44 43 37.5" stroke="#52AEBE" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+  </svg></div>
 </div>
 
 <!-- FORM -->
@@ -60,11 +64,11 @@ button:disabled{opacity:.55}
     <p class="sub">Add meg a telefonszámod,<br>és elküldjük a rólad készült felvételt!</p>
   </div>
   <div class="field">
-    <input type="tel" id="phone" inputmode="tel" autocomplete="tel" placeholder="+36 20 000 0000">
+    <input type="tel" id="phone" inputmode="tel" autocomplete="tel" placeholder="+36 70 000 0000">
     <div class="err" id="err"></div>
   </div>
   <div class="consent" id="consent">
-    <div class="cbox">✓</div>
+    <div class="cbox">✕</div>
     <p>Hozzájárulok, hogy a <b>STRAND × ONE</b> ZipLine eseményén felvétel készül rólam, és azt SMS-ben elküldjétek a megadott telefonszámra.</p>
   </div>
   <div class="actions">

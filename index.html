@@ -139,6 +139,13 @@ button:disabled{opacity:.55}
   <p>Ez a link nem tartozik egyik sisakhoz sem.<br>Szkenneld be újra a sisakon lévő QR-kódot!</p>
 </div>
 
+<!-- SISAK MÉG AKTÍV -->
+<div class="center" id="busyview">
+  <div class="big">✋</div>
+  <h2>Ez a sisak még<br>használatban van</h2>
+  <p>Az előző videó még nincs kiküldve.<br><br>Kérd az operátor segítségét,<br>vagy válassz egy másik sisakot!</p>
+</div>
+
 <script>
 var API = 'https://script.google.com/macros/s/AKfycbyafR75AI1g8e9lwz5AzZ_KKqdVVY-QO1XZBB4A302bD60E7GqLA6ZZ0RNIAChLnRg/exec';
 var HELMET_COUNT = 20;
@@ -155,6 +162,16 @@ var pad = function(n){ return (n<10?'0':'')+n; };
 
 if (HELMET >= 1 && HELMET <= HELMET_COUNT) {
   document.getElementById('sisaknum').textContent = '#' + pad(HELMET);
+  // háttérben lekérdezzük: aktív-e még ez a sisak (dupla szken védelem)
+  fetch(API + '?status=' + HELMET)
+    .then(function(r){ return r.json(); })
+    .then(function(s){
+      if (s && s.active) {
+        document.getElementById('formview').style.display = 'none';
+        document.getElementById('busyview').style.display = 'flex';
+      }
+    })
+    .catch(function(){ /* ha nincs net, a szerver-oldali védelem így is véd */ });
 } else {
   document.getElementById('sisaklabel').textContent = 'ZIPLINE';
   document.getElementById('formview').style.display = 'none';

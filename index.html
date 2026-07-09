@@ -32,7 +32,23 @@ input[type=tel]::placeholder{color:rgba(18,18,18,.4)}
 input[type=tel]:focus{background:rgba(255,255,255,.45)}
 .err{margin-top:12px;font-size:13px;font-weight:900;color:#FFE1DE;background:rgba(255,91,78,.35);
   border-radius:12px;padding:10px 16px;display:none}
-.consent{margin-top:40px;display:flex;gap:14px;align-items:flex-start;cursor:pointer;user-select:none}
+.consent{margin-top:28px;display:flex;gap:14px;align-items:flex-start;cursor:pointer;user-select:none}
+.consent+.consent{margin-top:16px}
+.more{color:#fff;font-weight:900;text-decoration:underline;cursor:pointer;white-space:nowrap}
+.modal{display:none;position:fixed;inset:0;background:#fff;color:#121212;z-index:10;flex-direction:column}
+.modal.open{display:flex}
+.mhead{flex:none;display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:18px 24px;border-bottom:1px solid #e8e8e8}
+.mhead h3{font-size:16px;font-weight:900;line-height:1.3}
+.mclose{flex:none;width:38px;height:38px;border-radius:50%;background:#121212;color:#fff;
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;cursor:pointer}
+.mbody{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px 24px;
+  font-size:14px;line-height:1.65;font-weight:400}
+.mbody h4{font-weight:900;font-size:14px;margin:20px 0 6px}
+.mbody p{margin-bottom:10px}
+.mfoot{flex:none;padding:14px 24px calc(14px + env(safe-area-inset-bottom));
+  border-top:1px solid #e8e8e8;display:flex;justify-content:center}
+button.dim{opacity:.4}
 .cbox{flex:none;width:27px;height:27px;border:1.6px solid #fff;border-radius:50%;display:flex;
   align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;transition:all .15s}
 .consent.on .cbox{background:#fff;color:#121212;border-color:#fff}
@@ -65,12 +81,48 @@ button:disabled{opacity:.55}
     <input type="tel" id="phone" inputmode="tel" autocomplete="tel" placeholder="+36 70 000 0000">
     <div class="err" id="err"></div>
   </div>
-  <div class="consent" id="consent">
+  <div class="consent" id="consent1">
     <div class="cbox">✕</div>
-    <p>Hozzájárulok, hogy a <b>STRAND × ONE</b> ZipLine eseményén felvétel készül rólam, és azt SMS-ben elküldjétek a megadott telefonszámra.</p>
+    <p>Hozzájárulok, hogy a <b>STRAND × ONE</b> ZipLine eseményén felvétel készül rólam, és azt 4 napig tárolják… <span class="more" data-modal="modal1">több</span></p>
+  </div>
+  <div class="consent" id="consent2">
+    <div class="cbox">✕</div>
+    <p>Elolvastam és elfogadom a ZipLine-pálya használatának <b>kockázati feltételeit</b>… <span class="more" data-modal="modal2">több</span></p>
   </div>
   <div class="actions">
-    <button id="btn">Küldés</button>
+    <button id="btn" class="dim">Küldés</button>
+  </div>
+</div>
+
+<!-- ADATKEZELÉSI TÁJÉKOZTATÓ — a végleges szöveget ide kell beilleszteni -->
+<div class="modal" id="modal1">
+  <div class="mhead">
+    <h3>Adatkezelési hozzájárulás</h3>
+    <div class="mclose" data-close="modal1">✕</div>
+  </div>
+  <div class="mbody">
+    <p>Hozzájárulok, hogy a <b>STRAND × ONE</b> ZipLine eseményén videófelvétel készüljön rólam, és azt a szervezők a megadott telefonszámomra SMS-ben megküldjék.</p>
+    <h4>Az adatkezelés részletei</h4>
+    <p>A megadott telefonszámot és a rólam készült felvételt kizárólag a videó kézbesítésének céljából kezelik, és az esemény napjától számított <b>4 napig</b> tárolják, ezt követően véglegesen törlik.</p>
+    <p><i>— IDE KERÜL A JOGÁSZ ÁLTAL ÍRT TELJES ADATKEZELÉSI TÁJÉKOZTATÓ —</i></p>
+  </div>
+  <div class="mfoot">
+    <button data-accept="1">Elfogadom</button>
+  </div>
+</div>
+
+<!-- KOCKÁZATI FELTÉTELEK — a végleges szöveget ide kell beilleszteni -->
+<div class="modal" id="modal2">
+  <div class="mhead">
+    <h3>Kockázati feltételek</h3>
+    <div class="mclose" data-close="modal2">✕</div>
+  </div>
+  <div class="mbody">
+    <p>Kijelentem, hogy a ZipLine-pályát saját felelősségemre veszem igénybe, az eszköz használatára vonatkozó biztonsági előírásokat megismertem és betartom.</p>
+    <p><i>— IDE KERÜL A JOGÁSZ ÁLTAL ÍRT TELJES KOCKÁZATI TÁJÉKOZTATÓ —</i></p>
+  </div>
+  <div class="mfoot">
+    <button data-accept="2">Elfogadom</button>
   </div>
 </div>
 
@@ -109,10 +161,40 @@ if (HELMET >= 1 && HELMET <= HELMET_COUNT) {
   document.getElementById('invalidview').style.display = 'flex';
 }
 
-var consentOn = false;
-document.getElementById('consent').addEventListener('click', function(){
-  consentOn = !consentOn;
-  this.classList.toggle('on', consentOn);
+/* két kötelező hozzájárulás */
+var consents = { 1: false, 2: false };
+
+function updateBtn(){
+  document.getElementById('btn').classList.toggle('dim', !(consents[1] && consents[2]));
+}
+function setConsent(n, val){
+  consents[n] = val;
+  document.getElementById('consent' + n).classList.toggle('on', val);
+  updateBtn();
+}
+[1, 2].forEach(function(n){
+  document.getElementById('consent' + n).addEventListener('click', function(e){
+    if (e.target.classList.contains('more')) return; // a "több" nem pipál
+    setConsent(n, !consents[n]);
+  });
+});
+
+/* fullscreen olvasó modalok */
+document.querySelectorAll('.more').forEach(function(el){
+  el.addEventListener('click', function(){
+    document.getElementById(this.dataset.modal).classList.add('open');
+  });
+});
+document.querySelectorAll('.mclose').forEach(function(el){
+  el.addEventListener('click', function(){
+    document.getElementById(this.dataset.close).classList.remove('open');
+  });
+});
+document.querySelectorAll('[data-accept]').forEach(function(el){
+  el.addEventListener('click', function(){
+    setConsent(+this.dataset.accept, true);
+    this.closest('.modal').classList.remove('open');
+  });
 });
 
 function showErr(m){
@@ -131,7 +213,10 @@ document.getElementById('btn').addEventListener('click', function(){
   document.getElementById('err').style.display = 'none';
   var phone = normPhone(document.getElementById('phone').value);
   if (!phone) { showErr('Hibás telefonszám. Így add meg: +36 20 123 4567'); return; }
-  if (!consentOn) { showErr('A hozzájárulás kipipálása kötelező a videó kiküldéséhez.'); return; }
+  if (!consents[1] || !consents[2]) {
+    showErr('A folytatáshoz mindkét hozzájárulást ki kell pipálnod.');
+    return;
+  }
 
   var btn = this;
   btn.disabled = true; btn.textContent = 'Küldés…';

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#52AEBE">
+<title>ONE × STRAND ZipLine</title>
+<link rel="preload" href="/fonts/mont-black.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/mont-book.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:Mont;font-weight:900;font-display:swap;src:url(/fonts/mont-black.woff2)format('woff2')}
+@font-face{font-family:Mont;font-weight:400;font-display:swap;src:url(/fonts/mont-book.woff2)format('woff2')}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:#52AEBE;color:#fff;font-family:Mont,-apple-system,'Segoe UI',sans-serif;
+  min-height:100svh;display:flex;flex-direction:column;padding:28px 24px 32px;max-width:480px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center}
+.sisak{font-weight:900;font-size:19px;letter-spacing:.5px}
+.logo{width:54px;height:54px;background:#fff;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;color:#121212;font-style:italic;font-weight:900;font-size:20px;font-family:Georgia,serif}
+.view{display:flex;flex-direction:column;flex:1}
+.hero{margin-top:64px}
+h1{font-weight:900;font-size:76px;letter-spacing:-1px;line-height:1}
+.sub{margin-top:28px;font-weight:900;font-size:17px;line-height:1.5}
+.field{margin-top:48px}
+input[type=tel]{width:100%;height:58px;border-radius:29px;border:1.5px solid #fff;
+  background:rgba(255,255,255,.16);color:#fff;font-family:inherit;font-size:18px;font-weight:400;
+  padding:0 26px;outline:none}
+input[type=tel]::placeholder{color:rgba(255,255,255,.65)}
+input[type=tel]:focus{background:rgba(255,255,255,.24)}
+.err{margin-top:12px;font-size:13px;font-weight:900;color:#FFE1DE;background:rgba(255,91,78,.35);
+  border-radius:12px;padding:10px 16px;display:none}
+.consent{margin-top:40px;display:flex;gap:14px;align-items:flex-start;cursor:pointer;user-select:none}
+.cbox{flex:none;width:27px;height:27px;border:1.6px solid #fff;border-radius:50%;display:flex;
+  align-items:center;justify-content:center;font-size:15px;font-weight:900;color:transparent;transition:all .15s}
+.consent.on .cbox{background:#fff;color:#52AEBE}
+.consent p{font-size:12.5px;line-height:1.45;font-weight:400}
+.consent b{font-weight:900}
+.actions{margin-top:auto;padding-top:48px;display:flex;justify-content:center}
+button{min-width:150px;height:48px;border:none;border-radius:24px;background:#fff;color:#121212;
+  font-family:inherit;font-weight:900;font-size:16px;cursor:pointer}
+button:disabled{opacity:.55}
+.center{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;flex:1;gap:20px}
+.center .big{font-size:64px}
+.center h2{font-weight:900;font-size:34px}
+.center p{font-size:15px;line-height:1.5;max-width:300px}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="sisak" id="sisaklabel">ZIPLINE</div>
+  <div class="logo">one</div>
+</div>
+
+<!-- FORM -->
+<div class="view" id="formview">
+  <div class="hero">
+    <h1>Szia!</h1>
+    <p class="sub">Add meg a telefonszámod,<br>és elküldjük a rólad készült felvételt!</p>
+  </div>
+  <div class="field">
+    <input type="tel" id="phone" inputmode="tel" autocomplete="tel" placeholder="+36 20 000 0000">
+    <div class="err" id="err"></div>
+  </div>
+  <div class="consent" id="consent">
+    <div class="cbox">✓</div>
+    <p>Hozzájárulok, hogy a <b>STRAND × ONE</b> ZipLine eseményén felvétel készül rólam, és azt SMS-ben elküldjétek a megadott telefonszámra.</p>
+  </div>
+  <div class="actions">
+    <button id="btn">Küldés</button>
+  </div>
+</div>
+
+<!-- SIKER -->
+<div class="center" id="doneview">
+  <div class="big">🤙</div>
+  <h2>Kész!</h2>
+  <p>A <b id="donehelmet"></b> mostantól a tiéd.<br><br>Lecsúszás után SMS-ben küldjük a videód linkjét erre a számra:<br><b id="donephone"></b></p>
+</div>
+
+<!-- HIBÁS QR -->
+<div class="center" id="invalidview">
+  <h2>Hoppá!</h2>
+  <p>Ez a link nem tartozik egyik sisakhoz sem.<br>Szkenneld be újra a sisakon lévő QR-kódot!</p>
+</div>
+
+<script>
+var API = 'https://script.google.com/macros/s/AKfycbyafR75AI1g8e9lwz5AzZ_KKqdVVY-QO1XZBB4A302bD60E7GqLA6ZZ0RNIAChLnRg/exec';
+var HELMET_COUNT = 20;
+
+/* sisak szám: /6 útvonalból vagy ?helmet=6 paraméterből */
+function getHelmet(){
+  var m = location.pathname.match(/^\/(\d{1,2})\/?$/);
+  if (m) return +m[1];
+  var q = new URLSearchParams(location.search).get('helmet');
+  return q ? +q : 0;
+}
+var HELMET = getHelmet();
+var pad = function(n){ return (n<10?'0':'')+n; };
+
+if (HELMET >= 1 && HELMET <= HELMET_COUNT) {
+  document.getElementById('sisaklabel').textContent = 'SISAK #' + pad(HELMET);
+} else {
+  document.getElementById('formview').style.display = 'none';
+  document.getElementById('invalidview').style.display = 'flex';
+}
+
+var consentOn = false;
+document.getElementById('consent').addEventListener('click', function(){
+  consentOn = !consentOn;
+  this.classList.toggle('on', consentOn);
+});
+
+function showErr(m){
+  var e = document.getElementById('err');
+  e.textContent = m; e.style.display = 'block';
+}
+function normPhone(raw){
+  var d = raw.replace(/[^\d+]/g,'');
+  if (d.indexOf('06')===0) d = '+36'+d.slice(2);
+  else if (d.indexOf('36')===0 && d[0]!=='+') d = '+'+d;
+  else if (d[0]!=='+' && d.length===9) d = '+36'+d;
+  return /^\+36\d{9}$/.test(d) ? d : null;
+}
+
+document.getElementById('btn').addEventListener('click', function(){
+  document.getElementById('err').style.display = 'none';
+  var phone = normPhone(document.getElementById('phone').value);
+  if (!phone) { showErr('Hibás telefonszám. Így add meg: +36 20 123 4567'); return; }
+  if (!consentOn) { showErr('A hozzájárulás kipipálása kötelező a videó kiküldéséhez.'); return; }
+
+  var btn = this;
+  btn.disabled = true; btn.textContent = 'Küldés…';
+
+  var ctrl = new AbortController();
+  var timer = setTimeout(function(){ ctrl.abort(); }, 20000);
+
+  fetch(API, {
+    method: 'POST',
+    body: JSON.stringify({ helmet: HELMET, phone: phone }),
+    signal: ctrl.signal
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(res){
+    clearTimeout(timer);
+    if (!res.ok) throw new Error(res.error || 'Hiba történt');
+    document.getElementById('formview').style.display = 'none';
+    var d = document.getElementById('doneview');
+    d.style.display = 'flex';
+    document.getElementById('donehelmet').textContent = 'SISAK #' + pad(HELMET);
+    document.getElementById('donephone').textContent = res.phone;
+  })
+  .catch(function(err){
+    clearTimeout(timer);
+    btn.disabled = false; btn.textContent = 'Küldés';
+    showErr(err.name === 'AbortError'
+      ? 'Gyenge a net — próbáld újra!'
+      : String(err.message || 'Hiba történt, próbáld újra!').replace('Error: ',''));
+  });
+});
+</script>
+</body>
+</html>

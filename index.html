@@ -16,6 +16,7 @@ body{background:#52AEBE;color:#fff;font-family:Mont,-apple-system,'Segoe UI',san
   min-height:100svh;display:flex;flex-direction:column;padding:28px 24px 32px;max-width:480px;margin:0 auto}
 .top{display:flex;justify-content:space-between;align-items:center}
 .sisak{font-weight:900;font-size:19px;letter-spacing:.5px}
+.sisak .sw{color:#121212}
 .logo{width:54px;height:54px}
 .logo svg,.logo img{width:100%;height:100%;display:block}
 .view{display:flex;flex-direction:column;flex:1}
@@ -49,7 +50,7 @@ button:disabled{opacity:.55}
 <body>
 
 <div class="top">
-  <div class="sisak" id="sisaklabel">ZIPLINE</div>
+  <div class="sisak" id="sisaklabel"><span class="sw">SISAK</span> <span id="sisaknum"></span></div>
   <div class="logo"><img src="/logo.png" alt="ONE" width="54" height="54"></div>
 </div>
 
@@ -100,8 +101,9 @@ var HELMET = getHelmet();
 var pad = function(n){ return (n<10?'0':'')+n; };
 
 if (HELMET >= 1 && HELMET <= HELMET_COUNT) {
-  document.getElementById('sisaklabel').textContent = 'SISAK #' + pad(HELMET);
+  document.getElementById('sisaknum').textContent = '#' + pad(HELMET);
 } else {
+  document.getElementById('sisaklabel').textContent = 'ZIPLINE';
   document.getElementById('formview').style.display = 'none';
   document.getElementById('invalidview').style.display = 'flex';
 }

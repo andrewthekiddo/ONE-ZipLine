@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#52AEBE">
+<title>A ZipLine videód — STRAND × ONE</title>
+<meta property="og:title" content="A ZipLine videóm 🤙">
+<meta property="og:description" content="STRAND × ONE ZipLine — nézd meg a videómat!">
+<meta property="og:image" content="https://one-zip-line-strand.vercel.app/logo.png">
+<link rel="preload" href="/fonts/mont-black.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/mont-book.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:Mont;font-weight:900;font-display:swap;src:url(/fonts/mont-black.woff2)format('woff2')}
+@font-face{font-family:Mont;font-weight:400;font-display:swap;src:url(/fonts/mont-book.woff2)format('woff2')}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:#52AEBE;color:#fff;font-family:Mont,-apple-system,'Segoe UI',sans-serif;
+  min-height:100svh;display:flex;flex-direction:column;padding:24px 20px 28px;max-width:480px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center}
+.brand{font-weight:900;font-size:17px}.brand .bk{color:#121212}
+.logo{width:48px;height:48px}.logo img{width:100%;height:100%;display:block}
+h1{font-weight:900;font-size:30px;margin-top:22px;line-height:1.15}
+h1 .bk{color:#121212}
+.videowrap{margin-top:18px;border-radius:18px;overflow:hidden;background:#121212;
+  box-shadow:0 8px 30px rgba(0,0,0,.25)}
+video{width:100%;display:block;max-height:62svh;background:#000}
+.pending{display:none;padding:48px 24px;text-align:center;font-weight:900;font-size:17px;line-height:1.5}
+.btns{margin-top:22px;display:flex;flex-direction:column;gap:12px}
+button{height:54px;border:none;border-radius:27px;font-family:inherit;font-weight:900;
+  font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px}
+.b1{background:#121212;color:#fff}
+.b2{background:#fff;color:#121212}
+.b3{background:rgba(255,255,255,.22);color:#fff;border:1.5px solid #fff}
+.note{margin-top:14px;text-align:center;font-size:12px;color:#121212;font-weight:400}
+.bk{color:#121212}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="brand">STRAND <span class="bk">×</span> ONE <span class="bk">ZIPLINE</span></div>
+  <div class="logo"><img src="/logo.png" alt="ONE"></div>
+</div>
+
+<h1><span class="bk">Ez volt</span> a te csúszásod! 🤙</h1>
+
+<div class="videowrap">
+  <video id="vid" controls playsinline preload="metadata"></video>
+  <div class="pending" id="pending">A videód még készül…<br>Nézz vissza pár perc múlva!</div>
+</div>
+
+<div class="btns">
+  <button class="b1" id="share">Megosztás — Insta · TikTok · Messenger</button>
+  <button class="b2" id="save">Mentés a galériába</button>
+  <button class="b3" id="fb">Megosztás Facebookon</button>
+</div>
+
+<p class="note">A videót 4 napig tároljuk, utána automatikusan törlődik.</p>
+
+<script>
+/* ⚙️ Videó tárhely alap-URL.
+   MOST: teszt mód, a videók a Vercel repóból jönnek (/videos mappa).
+   ÉLESBEN: ide jön a Cloudflare R2 publikus bucket URL-je! */
+var VIDEO_BASE = '/videos';
+
+var m = location.pathname.match(/^\/v\/([A-Za-z0-9._\-]+)\/?$/);
+var file = m ? decodeURIComponent(m[1]) : '';
+if (file && !/\.mp4$/i.test(file)) file += '.mp4';
+var url = VIDEO_BASE.replace(/\/$/, '') + '/' + file;
+
+var vid = document.getElementById('vid');
+if (file) {
+  vid.src = url;
+  vid.addEventListener('error', function(){
+    vid.style.display = 'none';
+    document.getElementById('pending').style.display = 'block';
+  });
+} else {
+  vid.style.display = 'none';
+  document.getElementById('pending').textContent = 'Hibás link — ellenőrizd az SMS-ben kapott címet!';
+  document.getElementById('pending').style.display = 'block';
+}
+
+function fetchBlob(){
+  return fetch(url).then(function(r){
+    if (!r.ok) throw new Error('nem elérhető');
+    return r.blob();
+  });
+}
+
+/* Natív megosztás: a telefon saját megosztó menüje magával a videófájllal —
+   innen megy Insta Story, TikTok, Messenger, WhatsApp, mentés, minden. */
+document.getElementById('share').addEventListener('click', function(){
+  var btn = this, orig = btn.textContent;
+  btn.textContent = 'Előkészítés…'; btn.disabled = true;
+  var done = function(){ btn.textContent = orig; btn.disabled = false; };
+  if (navigator.canShare) {
+    fetchBlob().then(function(b){
+      var f = new File([b], file, { type: 'video/mp4' });
+      if (navigator.canShare({ files: [f] })) {
+        return navigator.share({ files: [f], title: 'A ZipLine videóm 🤙' });
+      }
+      return navigator.share({ url: location.href, title: 'A ZipLine videóm 🤙' });
+    }).catch(function(){}).then(done);
+  } else if (navigator.share) {
+    navigator.share({ url: location.href, title: 'A ZipLine videóm 🤙' })
+      .catch(function(){}).then(done);
+  } else {
+    (navigator.clipboard ? navigator.clipboard.writeText(location.href) : Promise.reject())
+      .then(function(){ alert('Link a vágólapra másolva!'); })
+      .catch(function(){})
+      .then(done);
+  }
+});
+
+/* Mentés: blob letöltés — Androidon a Letöltésekbe/galériába,
+   iOS-en a rendszer menüjéből "Videó mentése". */
+document.getElementById('save').addEventListener('click', function(){
+  var btn = this, orig = btn.textContent;
+  btn.textContent = 'Letöltés…'; btn.disabled = true;
+  fetchBlob().then(function(b){
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(b);
+    a.download = file;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }).catch(function(){
+    alert('A videó még nem elérhető — próbáld pár perc múlva!');
+  }).then(function(){ btn.textContent = orig; btn.disabled = false; });
+});
+
+document.getElementById('fb').addEventListener('click', function(){
+  window.open('https://www.facebook.com/sharer/sharer.php?u=' +
+    encodeURIComponent(location.href), '_blank');
+});
+</script>
+</body>
+</html>

@@ -53,7 +53,6 @@ button{height:54px;border:none;border-radius:27px;font-family:inherit;font-weigh
 <div class="btns">
   <button class="b1" id="share">Megosztás — Insta · TikTok · Messenger</button>
   <button class="b2" id="save">Mentés a galériába</button>
-  <button class="b3" id="fb">Megosztás Facebookon</button>
 </div>
 
 <p class="note">A videót 4 napig tároljuk, utána automatikusan törlődik.</p>
@@ -131,10 +130,6 @@ document.getElementById('save').addEventListener('click', function(){
   }).then(function(){ btn.textContent = orig; btn.disabled = false; });
 });
 
-document.getElementById('fb').addEventListener('click', function(){
-  window.open('https://www.facebook.com/sharer/sharer.php?u=' +
-    encodeURIComponent(location.href), '_blank');
-});
 </script>
 </body>
 </html>

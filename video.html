@@ -51,8 +51,8 @@ button{height:54px;border:none;border-radius:27px;font-family:inherit;font-weigh
 </div>
 
 <div class="btns">
-  <button class="b1" id="share">Megosztás — Insta · TikTok · Messenger</button>
-  <button class="b2" id="save">Mentés a galériába</button>
+  <button class="b1" id="save">Mentés a galériába</button>
+  <button class="b2" id="share">Megosztás — Insta · TikTok · Facebook</button>
 </div>
 
 <p class="note">A videót 4 napig tároljuk, utána automatikusan törlődik.</p>
@@ -113,21 +113,33 @@ document.getElementById('share').addEventListener('click', function(){
   }
 });
 
-/* Mentés: blob letöltés — Androidon a Letöltésekbe/galériába,
-   iOS-en a rendszer menüjéből "Videó mentése". */
+/* Mentés a galériába:
+   iOS: a rendszer megosztó-menüje nyílik meg a videófájllal → "Videó mentése"
+        (iPhone-on ez az EGYETLEN út a galériába böngészőből)
+   Android/desktop: közvetlen letöltés */
+var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
 document.getElementById('save').addEventListener('click', function(){
   var btn = this, orig = btn.textContent;
-  btn.textContent = 'Letöltés…'; btn.disabled = true;
+  btn.textContent = 'Előkészítés…'; btn.disabled = true;
+  var done = function(){ btn.textContent = orig; btn.disabled = false; };
+
   fetchBlob().then(function(b){
+    var f = new File([b], file, { type: 'video/mp4' });
+    if (isIOS && navigator.canShare && navigator.canShare({ files: [f] })) {
+      // iOS: share sheet → "Videó mentése" gombbal kerül a galériába
+      return navigator.share({ files: [f] }).catch(function(){});
+    }
     var a = document.createElement('a');
     a.href = URL.createObjectURL(b);
     a.download = file;
     document.body.appendChild(a);
     a.click();
-    a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 4000);
   }).catch(function(){
     alert('A videó még nem elérhető — próbáld pár perc múlva!');
-  }).then(function(){ btn.textContent = orig; btn.disabled = false; });
+  }).then(done);
 });
 
 </script>

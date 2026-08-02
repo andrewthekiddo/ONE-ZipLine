@@ -216,7 +216,7 @@ function normPhone(raw){
 document.getElementById('btn').addEventListener('click', function(){
   document.getElementById('err').style.display = 'none';
   var phone = normPhone(document.getElementById('phone').value);
-  if (!phone) { showErr('Hibás telefonszám. Így add meg: +36 20 123 4567'); return; }
+  if (!phone) { showErr('Hibás telefonszám. Külföldi számot országkóddal adj meg: +40 722 123 456'); return; }
   if (!consents[1]) {
     showErr('A folytatáshoz a hozzájárulást ki kell pipálnod.');
     return;

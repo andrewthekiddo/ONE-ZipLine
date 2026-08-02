@@ -138,7 +138,7 @@ function uploadOne(f){
       });
 
       // SMS küldés gomb — a fájlnévből tudjuk a számot
-      var nm = /^(36\d{9})_/.exec(f.name);
+      var nm = /^(\d{8,15})_/.exec(f.name);
       if (nm) {
         var smsRow = document.createElement('div');
         smsRow.className = 'linkrow';

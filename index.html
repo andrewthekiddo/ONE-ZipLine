@@ -90,46 +90,26 @@ button:disabled{opacity:.55}
   </div>
   <div class="consent" id="consent1">
     <div class="cbox"></div>
-    <p>Hozzájárulok, hogy a <b class="wh">ONE 5G</b> <b>ÁTCSÚSZÓ PÁLYA</b> eseményén felvétel készül rólam, és azt 7 napig tárolják… <span class="more" data-modal="modal1">több</span></p>
-  </div>
-  <div class="consent" id="consent2">
-    <div class="cbox"></div>
-    <p>Elolvastam és elfogadom az Átcsúszó Pálya használatának <b>kockázati feltételeit</b>… <span class="more" data-modal="modal2">több</span></p>
+    <p>Hozzájárulok, hogy a <b class="wh">ONE 5G</b> <b>ÁTCSÚSZÓ PÁLYÁN</b> videó készüljön rólam, amit SMS-ben megkapok, és <b>7 napig tárolnak</b>. <span class="more" data-modal="modal1">több</span></p>
   </div>
   <div class="actions">
     <button id="btn" class="dim">Küldés</button>
   </div>
 </div>
 
-<!-- ADATKEZELÉSI TÁJÉKOZTATÓ — a végleges szöveget ide kell beilleszteni -->
+<!-- VIDEÓFELVÉTEL ÉS ADATKEZELÉS -->
 <div class="modal" id="modal1">
   <div class="mhead">
-    <h3>Adatkezelési hozzájárulás</h3>
+    <h3>Videófelvétel és adatkezelés</h3>
     <div class="mclose" data-close="modal1">✕</div>
   </div>
   <div class="mbody">
-    <p>Hozzájárulok, hogy a <b>ONE 5G ÁTCSÚSZÓ PÁLYA</b> eseményén videófelvétel készüljön rólam, és azt a szervezők a megadott telefonszámomra SMS-ben megküldjék.</p>
-    <h4>Az adatkezelés részletei</h4>
-    <p>A megadott telefonszámot és a rólam készült felvételt kizárólag a videó kézbesítésének céljából kezelik, és <b>7 napig</b> (legkésőbb 2026. augusztus 29-ig) tárolják, ezt követően véglegesen törlik.</p>
-    <p><i>— IDE KERÜL A JOGÁSZ ÁLTAL ÍRT TELJES ADATKEZELÉSI TÁJÉKOZTATÓ —</i></p>
+    <p>A <b>ONE 5G Átcsúszó Pályán</b> minden csúszásról videófelvétel készül, amelyet SMS-ben küldünk el a regisztrációnál megadott telefonszámra.</p>
+    <p>Kizárólag a telefonszámodat és a rólad készült videót kezeljük, egyetlen célra: hogy a videódat eljuttassuk hozzád. A telefonszámodat nem használjuk marketingcélra, és nem adjuk át harmadik félnek.</p>
+    <p>A felvételt és a telefonszámodat <b>7 napig tároljuk</b>, ezt követően véglegesen és automatikusan törlődnek.</p>
   </div>
   <div class="mfoot">
     <button data-accept="1">Elfogadom</button>
-  </div>
-</div>
-
-<!-- KOCKÁZATI FELTÉTELEK — a végleges szöveget ide kell beilleszteni -->
-<div class="modal" id="modal2">
-  <div class="mhead">
-    <h3>Kockázati feltételek</h3>
-    <div class="mclose" data-close="modal2">✕</div>
-  </div>
-  <div class="mbody">
-    <p>Kijelentem, hogy az Átcsúszó Pályát saját felelősségemre veszem igénybe, az eszköz használatára vonatkozó biztonsági előírásokat megismertem és betartom.</p>
-    <p><i>— IDE KERÜL A JOGÁSZ ÁLTAL ÍRT TELJES KOCKÁZATI TÁJÉKOZTATÓ —</i></p>
-  </div>
-  <div class="mfoot">
-    <button data-accept="2">Elfogadom</button>
   </div>
 </div>
 
@@ -185,18 +165,18 @@ if (HELMET >= 1 && HELMET <= HELMET_COUNT) {
   document.getElementById('invalidview').style.display = 'flex';
 }
 
-/* két kötelező hozzájárulás */
-var consents = { 1: false, 2: false };
+/* egyetlen kötelező hozzájárulás */
+var consents = { 1: false };
 
 function updateBtn(){
-  document.getElementById('btn').classList.toggle('dim', !(consents[1] && consents[2]));
+  document.getElementById('btn').classList.toggle('dim', !consents[1]);
 }
 function setConsent(n, val){
   consents[n] = val;
   document.getElementById('consent' + n).classList.toggle('on', val);
   updateBtn();
 }
-[1, 2].forEach(function(n){
+[1].forEach(function(n){
   document.getElementById('consent' + n).addEventListener('click', function(e){
     if (e.target.classList.contains('more')) return; // a "több" nem pipál
     setConsent(n, !consents[n]);
@@ -237,8 +217,8 @@ document.getElementById('btn').addEventListener('click', function(){
   document.getElementById('err').style.display = 'none';
   var phone = normPhone(document.getElementById('phone').value);
   if (!phone) { showErr('Hibás telefonszám. Így add meg: +36 20 123 4567'); return; }
-  if (!consents[1] || !consents[2]) {
-    showErr('A folytatáshoz mindkét hozzájárulást ki kell pipálnod.');
+  if (!consents[1]) {
+    showErr('A folytatáshoz a hozzájárulást ki kell pipálnod.');
     return;
   }
 

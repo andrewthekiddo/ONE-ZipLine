@@ -156,10 +156,12 @@ function uploadOne(f){
           .then(function(r){ return r.json(); })
           .then(function(res){
             if (res.ok) {
-              smsBtn.textContent = '✅ SMS elküldve → ' + res.number;
+              smsBtn.textContent = (res.sheet && res.sheet.ok)
+                ? '✅ SMS elküldve → ' + res.number + ' · Sheet ✓'
+                : '✅ SMS elküldve → ' + res.number + ' (Sheetben pipáld kézzel!)';
             } else {
               smsBtn.disabled = false;
-              smsBtn.textContent = '❌ ' + (res.error || 'SMS hiba') + ' — újra';
+              smsBtn.textContent = '❌ ' + ((res.twilio && res.twilio.error) || res.error || 'SMS hiba') + ' — újra';
             }
           })
           .catch(function(){

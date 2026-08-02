@@ -136,6 +136,38 @@ function uploadOne(f){
         var b = this;
         setTimeout(function(){ b.textContent = 'Másolás'; }, 2000);
       });
+
+      // SMS küldés gomb — a fájlnévből tudjuk a számot
+      var nm = /^(36\d{9})_/.exec(f.name);
+      if (nm) {
+        var smsRow = document.createElement('div');
+        smsRow.className = 'linkrow';
+        smsRow.innerHTML = '<button style="flex:1">📩 SMS küldése → +' + nm[1] + '</button>';
+        el.appendChild(smsRow);
+        var smsBtn = smsRow.querySelector('button');
+        smsBtn.addEventListener('click', function(){
+          smsBtn.disabled = true;
+          smsBtn.textContent = 'Küldés…';
+          fetch(WORKER + '/sms', {
+            method: 'POST',
+            headers: { 'X-Upload-Key': keyInput.value.trim(), 'Content-Type': 'text/plain' },
+            body: JSON.stringify({ file: f.name })
+          })
+          .then(function(r){ return r.json(); })
+          .then(function(res){
+            if (res.ok) {
+              smsBtn.textContent = '✅ SMS elküldve → ' + res.number;
+            } else {
+              smsBtn.disabled = false;
+              smsBtn.textContent = '❌ ' + (res.error || 'SMS hiba') + ' — újra';
+            }
+          })
+          .catch(function(){
+            smsBtn.disabled = false;
+            smsBtn.textContent = '❌ Hálózati hiba — újra';
+          });
+        });
+      }
     } else {
       status.textContent = '❌ ' + (res.error || ('Hiba (HTTP ' + xhr.status + ')')) + ' — próbáld újra!';
       status.className = 'status err';

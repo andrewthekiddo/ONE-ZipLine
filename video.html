@@ -58,10 +58,8 @@ button{height:54px;border:none;border-radius:27px;font-family:inherit;font-weigh
 <p class="note">A videót 7 napig tároljuk, utána automatikusan törlődik.</p>
 
 <script>
-/* ⚙️ Videó tárhely alap-URL.
-   MOST: teszt mód, a videók a Vercel repóból jönnek (/videos mappa).
-   ÉLESBEN: ide jön a Cloudflare R2 publikus bucket URL-je! */
-var VIDEO_BASE = '/videos';
+/* ⚙️ Videó tárhely: Cloudflare R2, a zipline Worker-en keresztül */
+var VIDEO_BASE = 'https://zipline.zipline-one.workers.dev';
 
 var m = location.pathname.match(/^\/v\/([A-Za-z0-9._\-]+)\/?$/);
 var file = m ? decodeURIComponent(m[1]) : '';

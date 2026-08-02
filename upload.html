@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Feltöltés — ONE 5G Átcsúszó Pálya</title>
+<style>
+@font-face{font-family:Mont;font-weight:900;font-display:swap;src:url(/fonts/mont-black.woff2)format('woff2')}
+@font-face{font-family:Mont;font-weight:700;font-display:swap;src:url(/fonts/mont-bold.woff2)format('woff2')}
+@font-face{font-family:Mont;font-weight:400;font-display:swap;src:url(/fonts/mont-book.woff2)format('woff2')}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#52AEBE;color:#fff;font-family:Mont,-apple-system,sans-serif;
+  min-height:100svh;padding:28px 20px 40px;max-width:680px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px}
+.brand{font-weight:900;font-size:17px}.brand .bk{color:#000}
+.logo{width:48px;height:48px}.logo img{width:100%;height:100%}
+h1{font-weight:900;font-size:34px;color:#000;margin-bottom:6px}
+.hint{font-size:13px;font-weight:400;line-height:1.5;margin-bottom:22px}
+label{font-weight:900;font-size:12px;display:block;margin:14px 0 6px;color:#000}
+input[type=password]{width:100%;height:48px;border-radius:24px;border:1.5px solid #fff;
+  background:rgba(255,255,255,.35);color:#000;font-family:inherit;font-size:15px;
+  font-weight:700;padding:0 20px;outline:none}
+.drop{margin-top:20px;border:2px dashed #fff;border-radius:20px;padding:44px 20px;
+  text-align:center;font-weight:900;font-size:16px;cursor:pointer;transition:background .15s}
+.drop.over{background:rgba(255,255,255,.25)}
+.drop small{display:block;margin-top:8px;font-weight:400;font-size:12px}
+#fileinput{display:none}
+.item{margin-top:16px;background:rgba(255,255,255,.18);border-radius:16px;padding:14px 18px}
+.item .name{font-weight:900;font-size:14px;word-break:break-all}
+.bar{margin-top:10px;height:10px;border-radius:5px;background:rgba(0,0,0,.25);overflow:hidden}
+.bar i{display:block;height:100%;width:0%;background:#000;border-radius:5px;transition:width .2s}
+.item.done .bar i{background:#fff}
+.status{margin-top:8px;font-size:12.5px;font-weight:700}
+.status.err{color:#FFE1DE}
+.linkrow{margin-top:10px;display:flex;gap:8px;align-items:center}
+.linkrow input{flex:1;height:40px;border-radius:20px;border:none;background:rgba(255,255,255,.9);
+  color:#000;font-family:inherit;font-size:12.5px;font-weight:700;padding:0 14px;outline:none}
+.linkrow button{height:40px;padding:0 18px;border:none;border-radius:20px;background:#000;
+  color:#fff;font-family:inherit;font-weight:900;font-size:13px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="brand">ONE 5G <span class="bk">ÁTCSÚSZÓ PÁLYA</span></div>
+  <div class="logo"><img src="/logo.png" alt="ONE"></div>
+</div>
+
+<h1>Videó feltöltés</h1>
+<p class="hint">A kész, átnevezett videót dobd be ide. Feltöltés után kapod a linket,
+amit az SMS-be kell másolni. A fájlnév formátuma: <b>0808-1620_36301234567.mp4</b></p>
+
+<label>Feltöltő jelszó</label>
+<input type="password" id="key" placeholder="ONE-zip-…" autocomplete="off">
+
+<div class="drop" id="drop">
+  📼 Húzd ide a videó(ka)t, vagy koppints
+  <small>csak .mp4 — egyszerre több fájl is jöhet</small>
+  <input type="file" id="fileinput" accept="video/mp4,.mp4" multiple>
+</div>
+
+<div id="list"></div>
+
+<script>
+var WORKER = 'https://zipline.zipline-one.workers.dev';
+var PLAYER = 'https://one-zip-line-strand.vercel.app';
+var FILE_RE = /^[A-Za-z0-9._+-]{1,120}\.mp4$/;
+
+var keyInput = document.getElementById('key');
+keyInput.value = localStorage.getItem('upkey') || '';
+keyInput.addEventListener('input', function(){ localStorage.setItem('upkey', this.value.trim()); });
+
+var drop = document.getElementById('drop');
+var fileinput = document.getElementById('fileinput');
+drop.addEventListener('click', function(){ fileinput.click(); });
+fileinput.addEventListener('change', function(){ handleFiles(this.files); this.value=''; });
+['dragover','dragenter'].forEach(function(ev){
+  drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.add('over'); });
+});
+['dragleave','drop'].forEach(function(ev){
+  drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.remove('over'); });
+});
+drop.addEventListener('drop', function(e){ handleFiles(e.dataTransfer.files); });
+
+function handleFiles(files){
+  for (var i = 0; i < files.length; i++) uploadOne(files[i]);
+}
+
+function uploadOne(f){
+  var el = document.createElement('div');
+  el.className = 'item';
+  el.innerHTML = '<div class="name">' + f.name + '</div>' +
+    '<div class="bar"><i></i></div><div class="status">Várakozás…</div>';
+  document.getElementById('list').prepend(el);
+  var bar = el.querySelector('.bar i');
+  var status = el.querySelector('.status');
+
+  var key = keyInput.value.trim();
+  if (!key) { status.textContent = '⚠️ Add meg fent a feltöltő jelszót!'; status.className='status err'; return; }
+  if (!FILE_RE.test(f.name)) {
+    status.textContent = '⚠️ Hibás fájlnév! Így nevezd: 0808-1620_36301234567.mp4 (ékezet és szóköz nélkül)';
+    status.className = 'status err';
+    return;
+  }
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('PUT', WORKER + '/upload/' + encodeURIComponent(f.name));
+  xhr.setRequestHeader('X-Upload-Key', key);
+  xhr.upload.addEventListener('progress', function(e){
+    if (e.lengthComputable) {
+      var pct = Math.round(e.loaded / e.total * 100);
+      bar.style.width = pct + '%';
+      status.textContent = 'Feltöltés… ' + pct + '%';
+    }
+  });
+  xhr.addEventListener('load', function(){
+    var res = {};
+    try { res = JSON.parse(xhr.responseText); } catch(e){}
+    if (xhr.status === 200 && res.ok) {
+      el.classList.add('done');
+      bar.style.width = '100%';
+      var link = PLAYER + '/v/' + f.name.replace(/\.mp4$/i, '');
+      status.textContent = '✅ Kész!';
+      var row = document.createElement('div');
+      row.className = 'linkrow';
+      row.innerHTML = '<input readonly value="' + link + '"><button>Másolás</button>';
+      el.appendChild(row);
+      row.querySelector('button').addEventListener('click', function(){
+        var inp = row.querySelector('input');
+        inp.select();
+        (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject())
+          .catch(function(){ document.execCommand('copy'); });
+        this.textContent = 'Másolva ✓';
+        var b = this;
+        setTimeout(function(){ b.textContent = 'Másolás'; }, 2000);
+      });
+    } else {
+      status.textContent = '❌ ' + (res.error || ('Hiba (HTTP ' + xhr.status + ')')) + ' — próbáld újra!';
+      status.className = 'status err';
+    }
+  });
+  xhr.addEventListener('error', function(){
+    status.textContent = '❌ Hálózati hiba — ellenőrizd a netet és próbáld újra!';
+    status.className = 'status err';
+  });
+  xhr.send(f);
+}
+</script>
+</body>
+</html>

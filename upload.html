@@ -50,7 +50,7 @@ input[type=password]{width:100%;height:48px;border-radius:24px;border:1.5px soli
 <h1>Videó feltöltés</h1>
 <p class="hint">Nevezd át a videót a Sheet <b>FÁJLNÉV</b> oszlopából másolt névre
 (a .mp4 kiterjesztés magától megmarad), és dobd be ide. Feltöltés után kapod a linket.
-Példa kész fájlnév: <b>+36301234567_20.51-08.02.mp4</b></p>
+Példa kész fájlnév: <b>36301234567_20.51-08.02.mp4</b></p>
 
 <label>Feltöltő jelszó</label>
 <input type="password" id="key" placeholder="ONE-zip-…" autocomplete="off">
@@ -100,7 +100,7 @@ function uploadOne(f){
   var key = keyInput.value.trim();
   if (!key) { status.textContent = '⚠️ Add meg fent a feltöltő jelszót!'; status.className='status err'; return; }
   if (!FILE_RE.test(f.name)) {
-    status.textContent = '⚠️ Hibás fájlnév! Így nevezd: +36301234567_20.51-08.02.mp4 (a Sheet FÁJLNÉV oszlopából másold)';
+    status.textContent = '⚠️ Hibás fájlnév! Így nevezd: 36301234567_20.51-08.02.mp4 (a Sheet FÁJLNÉV oszlopából másold)';
     status.className = 'status err';
     return;
   }

@@ -161,7 +161,7 @@ function uploadOne(f){
                 : '✅ SMS elküldve → ' + res.number + ' (Sheetben pipáld kézzel!)';
             } else {
               smsBtn.disabled = false;
-              smsBtn.textContent = '❌ ' + ((res.twilio && res.twilio.error) || res.error || 'SMS hiba') + ' — újra';
+              smsBtn.textContent = '❌ ' + ((res.sms && res.sms.error) || res.error || 'SMS hiba') + ' — újra';
             }
           })
           .catch(function(){

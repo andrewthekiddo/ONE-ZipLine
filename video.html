@@ -64,7 +64,9 @@ var VIDEO_BASE = 'https://zipline.zipline-one.workers.dev';
 var m = location.pathname.match(/^\/v\/([A-Za-z0-9._+\-]+|%2B[A-Za-z0-9._%+\-]+)\/?$/);
 var file = m ? decodeURIComponent(m[1]) : '';
 if (file && !/\.mp4$/i.test(file)) file += '.mp4';
-var url = VIDEO_BASE.replace(/\/$/, '') + '/' + file;
+var url = /_/.test(file)
+  ? VIDEO_BASE.replace(/\/$/, '') + '/' + file
+  : VIDEO_BASE.replace(/\/$/, '') + '/c/' + file;
 
 var vid = document.getElementById('vid');
 if (file) {

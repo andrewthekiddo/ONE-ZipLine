@@ -121,7 +121,7 @@ function uploadOne(f){
     if (xhr.status === 200 && res.ok) {
       el.classList.add('done');
       bar.style.width = '100%';
-      var link = PLAYER + '/v/' + f.name.replace(/\.mp4$/i, '');
+      var link = res.link || (PLAYER + '/v/' + f.name.replace(/\.mp4$/i, ''));
       status.textContent = '✅ Kész!';
       var row = document.createElement('div');
       row.className = 'linkrow';

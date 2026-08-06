@@ -57,7 +57,7 @@ Példa kész fájlnév: <b>36301234567_08.02-20.51.mp4</b></p>
 
 <div class="drop" id="drop">
   Húzd ide a fájlt, vagy kattints a kiválasztáshoz
-  <small>Csak MP4</small>
+  <small>Csak mp4!</small>
   <input type="file" id="fileinput" accept="video/mp4,.mp4" multiple>
 </div>
 
@@ -156,7 +156,8 @@ function uploadOne(f){
           .then(function(r){ return r.json(); })
           .then(function(res){
             if (res.ok) {
-              smsBtn.style.background = '#1f9d55';
+              smsBtn.style.background = '#87CBD4';
+              smsBtn.style.color = '#000';
               smsBtn.textContent = (res.sheet && res.sheet.ok)
                 ? '✅ SMS elküldve → ' + res.number + ' · Sheet kipipálva'
                 : '✅ SMS elküldve → ' + res.number;

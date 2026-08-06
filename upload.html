@@ -123,7 +123,7 @@ function uploadOne(f){
       el.classList.add('done');
       bar.style.width = '100%';
       var link = res.link || (PLAYER + '/v/' + f.name.replace(/\.mp4$/i, ''));
-      status.textContent = '✅ Kész!';
+      status.textContent = '✅ Feltöltve';
       var row = document.createElement('div');
       row.className = 'linkrow';
       row.innerHTML = '<input readonly value="' + link + '"><button>Másolás</button>';
@@ -160,6 +160,7 @@ function uploadOne(f){
               smsBtn.style.background = '#87CBD4';
               smsBtn.style.color = '#000';
               el.classList.add('sent');
+              status.textContent = '✅ Kész!';
               smsBtn.textContent = (res.sheet && res.sheet.ok)
                 ? '✅ SMS elküldve → ' + res.number + ' · Sheet kipipálva'
                 : '✅ SMS elküldve → ' + res.number;

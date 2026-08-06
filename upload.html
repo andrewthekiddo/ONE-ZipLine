@@ -48,16 +48,16 @@ input[type=password]{width:100%;height:48px;border-radius:24px;border:1.5px soli
 </div>
 
 <h1>Videó feltöltés</h1>
-<p class="hint">Nevezd át a videót a Sheet <b>FÁJLNÉV</b> oszlopából másolt névre
-(a .mp4 kiterjesztés magától megmarad), és dobd be ide. Feltöltés után kapod a linket.
+<p class="hint">Nevezd át a fájlt a Sheet <b>FÁJLNÉV</b> oszlopából másolt névre,
+és ide dobd be. Feltöltés után kapod a linket.
 Példa kész fájlnév: <b>36301234567_08.02-20.51.mp4</b></p>
 
 <label>Feltöltő jelszó</label>
 <input type="password" id="key" placeholder="ONE-zip-…" autocomplete="off">
 
 <div class="drop" id="drop">
-  📼 Húzd ide a videó(ka)t, vagy koppints
-  <small>csak .mp4 — egyszerre több fájl is jöhet</small>
+  Húzd ide a fájlt, vagy kattints a kiválasztáshoz
+  <small>Csak MP4</small>
   <input type="file" id="fileinput" accept="video/mp4,.mp4" multiple>
 </div>
 
@@ -156,9 +156,10 @@ function uploadOne(f){
           .then(function(r){ return r.json(); })
           .then(function(res){
             if (res.ok) {
+              smsBtn.style.background = '#1f9d55';
               smsBtn.textContent = (res.sheet && res.sheet.ok)
-                ? '✅ SMS elküldve → ' + res.number + ' · Sheet ✓'
-                : '✅ SMS elküldve → ' + res.number + ' (Sheetben pipáld kézzel!)';
+                ? '✅ SMS elküldve → ' + res.number + ' · Sheet kipipálva'
+                : '✅ SMS elküldve → ' + res.number;
             } else {
               smsBtn.disabled = false;
               smsBtn.textContent = '❌ ' + ((res.sms && res.sms.error) || res.error || 'SMS hiba') + ' — újra';

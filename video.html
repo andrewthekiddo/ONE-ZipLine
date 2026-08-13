@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#52AEBE">
-<title>A videód — ONE 5G Átcsúszó Pálya</title>
+<title>A videód — ONE 5G Átcsúszópálya</title>
 <meta property="og:title" content="A ZipLine videóm 🤙">
-<meta property="og:description" content="ONE 5G Átcsúszó Pálya — nézd meg a videómat!">
+<meta property="og:description" content="ONE 5G Átcsúszópálya — nézd meg a videómat!">
 <meta property="og:image" content="https://one-5g-atcsuszopalya.hu/logo.png">
 <link rel="preload" href="/fonts/mont-black.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/mont-book.woff2" as="font" type="font/woff2" crossorigin>
@@ -39,7 +39,7 @@ button{height:54px;border:none;border-radius:27px;font-family:inherit;font-weigh
 <body>
 
 <div class="top">
-  <div class="brand">ONE 5G <span class="bk">ÁTCSÚSZÓ PÁLYA</span></div>
+  <div class="brand">ONE 5G <span class="bk">ÁTCSÚSZÓPÁLYA</span></div>
   <div class="logo"><img src="/logo.png" alt="ONE"></div>
 </div>
 
@@ -51,8 +51,7 @@ button{height:54px;border:none;border-radius:27px;font-family:inherit;font-weigh
 </div>
 
 <div class="btns">
-  <button class="b1" id="save">Mentés a galériába</button>
-  <button class="b2" id="share">Megosztás — Insta · TikTok · Facebook</button>
+  <button class="b1" id="share">Megosztás — Insta · TikTok · Facebook</button>
 </div>
 
 <p class="note">A videót 7 napig tároljuk, utána automatikusan törlődik.</p>
@@ -111,35 +110,6 @@ document.getElementById('share').addEventListener('click', function(){
       .catch(function(){})
       .then(done);
   }
-});
-
-/* Mentés a galériába:
-   iOS: a rendszer megosztó-menüje nyílik meg a videófájllal → "Videó mentése"
-        (iPhone-on ez az EGYETLEN út a galériába böngészőből)
-   Android/desktop: közvetlen letöltés */
-var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
-document.getElementById('save').addEventListener('click', function(){
-  var btn = this, orig = btn.textContent;
-  btn.textContent = 'Előkészítés…'; btn.disabled = true;
-  var done = function(){ btn.textContent = orig; btn.disabled = false; };
-
-  fetchBlob().then(function(b){
-    var f = new File([b], file, { type: 'video/mp4' });
-    if (isIOS && navigator.canShare && navigator.canShare({ files: [f] })) {
-      // iOS: share sheet → "Videó mentése" gombbal kerül a galériába
-      return navigator.share({ files: [f] }).catch(function(){});
-    }
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(b);
-    a.download = file;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 4000);
-  }).catch(function(){
-    alert('A videó még nem elérhető — próbáld pár perc múlva!');
-  }).then(done);
 });
 
 </script>

@@ -69,7 +69,8 @@ var url = /_/.test(file)
 
 var vid = document.getElementById('vid');
 if (file) {
-  vid.src = url;
+  /* #t=0.1: a böngésző az első képkockát mutatja előnézetként (nem marad fekete) */
+  vid.src = url + '#t=0.1';
   vid.addEventListener('error', function(){
     vid.style.display = 'none';
     document.getElementById('pending').style.display = 'block';

@@ -101,7 +101,7 @@ function uploadOne(f){
   var key = keyInput.value.trim();
   if (!key) { status.textContent = '⚠️ Add meg fent a feltöltő jelszót!'; status.className='status err'; return; }
   if (!FILE_RE.test(f.name)) {
-    status.textContent = '⚠️ Hibás fájlnév! Így nevezd: 36301234567_08.02-20.51.mp4 (a Sheet FÁJLNÉV oszlopából másold)';
+    status.textContent = '⚠️ Hibás fájlnév! Így nevezd: cam-06_36301234567_08.02-20.51.mp4 (a Sheet FÁJLNÉV oszlopából másold)';
     status.className = 'status err';
     return;
   }
@@ -139,7 +139,7 @@ function uploadOne(f){
       });
 
       // SMS küldés gomb — a fájlnévből tudjuk a számot
-      var nm = /^(\d{8,15})_/.exec(f.name);
+      var nm = /^(?:cam-\d{1,2}_)?(\d{8,15})_/.exec(f.name);
       if (nm) {
         var smsRow = document.createElement('div');
         smsRow.className = 'linkrow';

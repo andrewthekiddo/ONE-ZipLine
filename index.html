@@ -230,31 +230,39 @@ document.getElementById('btn').addEventListener('click', function(){
   var btn = this;
   btn.disabled = true; btn.textContent = 'Küldés…';
 
-  var ctrl = new AbortController();
-  var timer = setTimeout(function(){ ctrl.abort(); }, 45000);
-
-  fetch(API, {
-    method: 'POST',
-    body: JSON.stringify({ helmet: HELMET, phone: phone }),
-    signal: ctrl.signal
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(res){
-    clearTimeout(timer);
-    if (!res.ok) throw new Error(res.error || 'Hiba történt');
-    document.getElementById('formview').style.display = 'none';
-    var d = document.getElementById('doneview');
-    d.style.display = 'flex';
-    document.getElementById('donehelmet').textContent = 'SISAK #' + pad(HELMET);
-    document.getElementById('donephone').textContent = res.phone;
-  })
-  .catch(function(err){
-    clearTimeout(timer);
-    btn.disabled = false; btn.textContent = 'Küldés';
-    showErr(err.name === 'AbortError'
-      ? 'Gyenge a net — próbáld újra!'
-      : String(err.message || 'Hiba történt, próbáld újra!').replace('Error: ',''));
-  });
+  function attempt(n){
+    var ctrl = new AbortController();
+    var timer = setTimeout(function(){ ctrl.abort(); }, 45000);
+    fetch(API, {
+      method: 'POST',
+      body: JSON.stringify({ helmet: HELMET, phone: phone }),
+      signal: ctrl.signal
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      clearTimeout(timer);
+      if (!res.ok) { var e = new Error(res.error || 'Hiba történt'); e.own = true; throw e; }
+      document.getElementById('formview').style.display = 'none';
+      var d = document.getElementById('doneview');
+      d.style.display = 'flex';
+      document.getElementById('donehelmet').textContent = 'SISAK #' + pad(HELMET);
+      document.getElementById('donephone').textContent = res.phone;
+    })
+    .catch(function(err){
+      clearTimeout(timer);
+      /* Hálózati/technikai hiba (nem a mi üzenetünk) → automatikus újraküldés.
+         A szerver az ismételt küldést ugyanarról a számról sikerként kezeli, nem duplikál. */
+      if (!err.own && n < 2) {
+        btn.textContent = 'Újrapróbálás…';
+        setTimeout(function(){ attempt(n + 1); }, 1500);
+        return;
+      }
+      btn.disabled = false; btn.textContent = 'Küldés';
+      /* Kifelé CSAK magyar üzenet mehet — a böngészők angol hibaszövegei soha */
+      showErr(err.own ? err.message : 'Gyenge a net — próbáld újra!');
+    });
+  }
+  attempt(1);
 });
 </script>
 </body>
